@@ -27,7 +27,7 @@ Não é necessário instalar Cypress ou Newman globalmente. As ferramentas são 
 Clone o repositório:
 
 ```bash
-git clone <URL_DO_REPOSITORIO>
+git clone https://github.com/grisantesergio/serve-rest-qa.git
 ```
 
 Entre na pasta:
