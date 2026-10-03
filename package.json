@@ -1,0 +1,25 @@
+{
+  "name": "serve-rest-qa",
+  "version": "1.0.0",
+  "description": "Testes de QA automatizados para o ServeRest",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run test:web && npm run test:api",
+    "test:web": "cypress run",
+    "test:api": "newman run \"ServeRest - C2 API.postman_collection.json\" -e \"ServeRest.postman_environment.json\""
+  },
+  "keywords": [
+    "qa",
+    "cypress",
+    "newman",
+    "postman",
+    "servrest"
+  ],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "cypress": "^16.1.1",
+    "newman": "^6.2.2"
+  }
+}

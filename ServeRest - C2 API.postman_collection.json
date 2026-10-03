@@ -1,0 +1,390 @@
+{
+  "info": {
+    "_postman_id": "f57f1172-1730-46e3-bfa5-a8e68d6e5551",
+    "name": "ServeRest - C2 API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. Cadastro de usuário - Sucesso",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const timestamp = Date.now();",
+              "pm.environment.set(\"nomeUsuario\", \"Usuario QA \" + timestamp);",
+              "pm.environment.set(\"emailUsuario\", \"qa.postman.\" + timestamp + \"@example.com\");",
+              "pm.environment.set(\"senhaUsuario\", \"Teste@123\");"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Mensagem de sucesso deve ser retornada\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Cadastro realizado com sucesso\"); });",
+              "pm.test(\"Deve retornar o ID do usuário\", function () { const response = pm.response.json(); pm.expect(response._id).to.exist; });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"{{nomeUsuario}}\",\n  \"email\": \"{{emailUsuario}}\",\n  \"password\": \"{{senhaUsuario}}\",\n  \"administrador\": \"false\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/usuarios",
+          "host": ["{{baseUrl}}"],
+          "path": ["usuarios"]
+        }
+      }
+    },
+    {
+      "name": "2. Cadastro de usuário - E-mail já cadastrado",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 400\", function () { pm.response.to.have.status(400); });",
+              "pm.test(\"Deve informar que o email já está sendo usado\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Este email já está sendo usado\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"{{nomeUsuario}}\",\n  \"email\": \"{{emailUsuario}}\",\n  \"password\": \"{{senhaUsuario}}\",\n  \"administrador\": \"false\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/usuarios",
+          "host": ["{{baseUrl}}"],
+          "path": ["usuarios"]
+        }
+      }
+    },
+    {
+      "name": "3. Login - Sucesso",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Mensagem de sucesso deve ser retornada\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Login realizado com sucesso\"); });",
+              "pm.test(\"Deve retornar o token de autorização\", function () { const response = pm.response.json(); pm.expect(response.authorization).to.exist; pm.expect(response.authorization).to.be.a(\"string\"); });",
+              "const response = pm.response.json();",
+              "pm.environment.set(\"tokenUsuario\", response.authorization.replace(\"Bearer \", \"\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailUsuario}}\",\n  \"password\": \"{{senhaUsuario}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "4. Login - Credenciais inválidas",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 401\", function () { pm.response.to.have.status(401); });",
+              "pm.test(\"Deve informar que o email ou senha são inválidos\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Email e/ou senha inválidos\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailUsuario}}\",\n  \"password\": \"SenhaInvalida@123\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "5. Cadastro de produto - Sem token",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 401\", function () { pm.response.to.have.status(401); });",
+              "pm.test(\"Deve informar que o token não foi fornecido\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Token de acesso ausente, inválido, expirado ou usuário do token não existe mais\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Produto QA Sem Token\",\n  \"preco\": 100,\n  \"descricao\": \"Produto para teste de API\",\n  \"quantidade\": 10\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/produtos",
+          "host": ["{{baseUrl}}"],
+          "path": ["produtos"]
+        }
+      }
+    },
+    {
+      "name": "6. Cadastro de produto - Usuário comum",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 403\", function () { pm.response.to.have.status(403); });",
+              "pm.test(\"Deve informar que a rota é exclusiva para administradores\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Rota exclusiva para administradores\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenUsuario}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"Produto QA Usuario Comum\",\n  \"preco\": 150,\n  \"descricao\": \"Produto para teste de usuario comum\",\n  \"quantidade\": 10\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/produtos",
+          "host": ["{{baseUrl}}"],
+          "path": ["produtos"]
+        }
+      }
+    },
+    {
+      "name": "7. Cadastro de usuário administrador",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const timestamp = Date.now();",
+              "pm.environment.set(\"nomeAdmin\", \"Administrador QA \" + timestamp);",
+              "pm.environment.set(\"emailAdmin\", \"admin.qa.\" + timestamp + \"@example.com\");",
+              "pm.environment.set(\"senhaAdmin\", \"Admin@123\");"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"{{nomeAdmin}}\",\n  \"email\": \"{{emailAdmin}}\",\n  \"password\": \"{{senhaAdmin}}\",\n  \"administrador\": \"true\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/usuarios",
+          "host": ["{{baseUrl}}"],
+          "path": ["usuarios"]
+        }
+      }
+    },
+    {
+      "name": "8. Login - Administrador",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "const response = pm.response.json();",
+              "pm.test(\"Status code deve ser 200\", function () { pm.response.to.have.status(200); });",
+              "pm.test(\"Deve retornar o token do administrador\", function () { pm.expect(response.authorization).to.exist; pm.expect(response.authorization).to.be.a(\"string\"); });",
+              "pm.environment.set(\"tokenAdmin\", response.authorization.replace(\"Bearer \", \"\"));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{emailAdmin}}\",\n  \"password\": \"{{senhaAdmin}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": ["{{baseUrl}}"],
+          "path": ["login"]
+        }
+      }
+    },
+    {
+      "name": "9. Cadastro de produto - Administrador",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.variables.set(\"nomeProduto\", \"Produto QA \" + Date.now());"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test(\"Status code deve ser 201\", function () { pm.response.to.have.status(201); });",
+              "pm.test(\"Deve retornar mensagem de sucesso\", function () { const response = pm.response.json(); pm.expect(response.message).to.eql(\"Cadastro realizado com sucesso\"); });",
+              "pm.test(\"Deve retornar o ID do produto\", function () { const response = pm.response.json(); pm.expect(response._id).to.exist; pm.expect(response._id).to.be.a(\"string\"); });",
+              "pm.test(\"Contrato da resposta deve possuir campos e tipos corretos\", function () { const response = pm.response.json(); pm.expect(response).to.have.property(\"message\"); pm.expect(response.message).to.be.a(\"string\"); pm.expect(response).to.have.property(\"_id\"); pm.expect(response._id).to.be.a(\"string\"); });"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Authorization",
+            "value": "Bearer {{tokenAdmin}}"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"nome\": \"{{nomeProduto}}\",\n  \"preco\": 200,\n  \"descricao\": \"Produto cadastrado por administrador\",\n  \"quantidade\": 20\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/produtos",
+          "host": ["{{baseUrl}}"],
+          "path": ["produtos"]
+        }
+      }
+    }
+  ]
+}
