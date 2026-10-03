@@ -151,7 +151,11 @@ Testes de usabilidade, validação visual, responsividade, acessibilidade e test
 
 ### Cypress
 
-Foi utilizado para os testes Web devido à experiência prévia com a ferramenta e à facilidade de implementação e manutenção dos cenários.
+Foi utilizado o Cypress para os testes Web principalmente pela minha experiência prévia com a ferramenta e pela familiaridade com sua interface e estrutura de execução.
+
+A interface do Cypress facilita a visualização dos testes durante a execução, permitindo acompanhar cada etapa do cenário e identificar com mais facilidade onde uma falha ocorreu. Esse recurso também facilita a depuração e a análise dos resultados.
+
+Além disso, a experiência anterior com o Cypress permitiu desenvolver os cenários de forma mais rápida, mantendo uma estrutura simples e de fácil manutenção. A escolha da ferramenta foi feita considerando tanto a experiência técnica já adquirida quanto a facilidade de visualização, execução e investigação dos resultados
 
 ### Postman + Newman
 
